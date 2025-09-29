@@ -1,0 +1,21 @@
+# Development Dockerfile with hot reload support
+FROM maven:3.9-eclipse-temurin-21-alpine
+
+WORKDIR /app
+
+# Copy pom.xml and download dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Copy source code
+COPY src ./src
+
+# Enable Spring Boot DevTools
+ENV SPRING_DEVTOOLS_RESTART_ENABLED=true
+ENV SPRING_DEVTOOLS_LIVERELOAD_ENABLED=true
+
+# Expose ports
+EXPOSE 8080 5005 35729
+
+# Run Spring Boot with DevTools
+CMD ["mvn", "spring-boot:run", "-Dspring-boot.run.fork=false"]
