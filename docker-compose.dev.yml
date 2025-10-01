@@ -5,7 +5,7 @@ services:
     image: postgres:16-alpine
     container_name: product-postgres-dev
     environment:
-      POSTGRES_DB: productdb
+      POSTGRES_DB: AiToooler
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -27,7 +27,7 @@ services:
     container_name: product-api-dev
     environment:
       SPRING_PROFILES_ACTIVE: docker,dev
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/productdb
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/AiToooler
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       JAVA_OPTS: -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005

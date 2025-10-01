@@ -6,9 +6,13 @@ server:
 spring:
   application:
     name: product-management-api
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/productdb
+    url: jdbc:postgresql://localhost:5432/AiToooler
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
