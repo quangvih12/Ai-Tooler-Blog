@@ -36,44 +36,53 @@ A comprehensive RESTful API for product management built with Spring Boot 3.2, P
 ## Quick Start with Docker
 
 ### 1. Clone the repository
+
 ```bash
 git clone <repository-url>
 cd product-management-api
 ```
 
 ### 2. Run with Docker Compose
+
 ```bash
 docker-compose up --build
 ```
 
 The application will be available at:
+
 - API: http://localhost:8080
 - Swagger UI: http://localhost:8080/swagger-ui.html
 - API Docs: http://localhost:8080/v3/api-docs
 
 ### 3. Default Credentials
+
 - Username: `admin`
 - Password: `admin123`
 
 ## Local Development Setup
 
 ### 1. Install PostgreSQL
+
 Make sure PostgreSQL is running on port 5432 with:
+
 - Database: `productdb`
 - Username: `postgres`
 - Password: `postgres`
 
 ### 2. Build the application
+
 ```bash
 mvn clean install
 ```
 
 ### 3. Run the application
+
 ```bash
 mvn spring-boot:run
 ```
 
 Or run the JAR file:
+
 ```bash
 java -jar target/product-management-api-0.0.1-SNAPSHOT.jar
 ```
@@ -83,6 +92,7 @@ java -jar target/product-management-api-0.0.1-SNAPSHOT.jar
 ### Authentication Endpoints
 
 #### Register User
+
 ```bash
 curl -X POST http://localhost:8080/api/auth/register \
   -H "Content-Type: application/json" \
@@ -95,6 +105,7 @@ curl -X POST http://localhost:8080/api/auth/register \
 ```
 
 #### Login
+
 ```bash
 curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
@@ -105,6 +116,7 @@ curl -X POST http://localhost:8080/api/auth/login \
 ```
 
 Response:
+
 ```json
 {
   "success": true,
@@ -123,18 +135,21 @@ Response:
 ### Product Endpoints (Protected - Requires JWT Token)
 
 #### Get All Products (with Pagination and Search)
+
 ```bash
 curl -X GET "http://localhost:8080/api/products?page=0&size=10&sortBy=createdAt&sortDirection=DESC&name=laptop&category=Electronics" \
   -H "Authorization: Bearer <your-jwt-token>"
 ```
 
 #### Get Product by ID
+
 ```bash
 curl -X GET http://localhost:8080/api/products/{product-id} \
   -H "Authorization: Bearer <your-jwt-token>"
 ```
 
-#### Create Product
+#### Create Productaa
+
 ```bash
 curl -X POST http://localhost:8080/api/products \
   -H "Authorization: Bearer <your-jwt-token>" \
@@ -150,6 +165,7 @@ curl -X POST http://localhost:8080/api/products \
 ```
 
 #### Update Product
+
 ```bash
 curl -X PUT http://localhost:8080/api/products/{product-id} \
   -H "Authorization: Bearer <your-jwt-token>" \
@@ -165,6 +181,7 @@ curl -X PUT http://localhost:8080/api/products/{product-id} \
 ```
 
 #### Delete Product
+
 ```bash
 curl -X DELETE http://localhost:8080/api/products/{product-id} \
   -H "Authorization: Bearer <your-jwt-token>"
@@ -173,6 +190,7 @@ curl -X DELETE http://localhost:8080/api/products/{product-id} \
 ## API Response Format
 
 All API responses follow this format:
+
 ```json
 {
   "success": true/false,
@@ -198,6 +216,7 @@ All API responses follow this format:
 ## Environment Configuration
 
 ### Application Properties
+
 The application can be configured through `application.yml`:
 
 ```yaml
@@ -218,6 +237,7 @@ application:
 ```
 
 ### Docker Environment Variables
+
 When running with Docker, you can override settings using environment variables:
 
 ```yaml
@@ -229,6 +249,7 @@ POSTGRES_PASSWORD: postgres
 ## Database Schema
 
 ### Users Table
+
 ```sql
 CREATE TABLE users (
     id UUID PRIMARY KEY,
@@ -243,6 +264,7 @@ CREATE TABLE users (
 ```
 
 ### Products Table
+
 ```sql
 CREATE TABLE products (
     id UUID PRIMARY KEY,
@@ -261,16 +283,19 @@ CREATE TABLE products (
 ## Testing
 
 ### Run all tests
+
 ```bash
 mvn test
 ```
 
 ### Run specific test class
+
 ```bash
 mvn test -Dtest=AuthServiceTest
 ```
 
 ### Test coverage includes:
+
 - Service layer unit tests
 - Controller integration tests
 - Authentication flow testing
@@ -279,26 +304,31 @@ mvn test -Dtest=AuthServiceTest
 ## Docker Commands
 
 ### Build and run
+
 ```bash
 docker-compose up --build
 ```
 
 ### Run in background
+
 ```bash
 docker-compose up -d
 ```
 
 ### Stop containers
+
 ```bash
 docker-compose down
 ```
 
 ### Remove containers and volumes
+
 ```bash
 docker-compose down -v
 ```
 
 ### View logs
+
 ```bash
 docker-compose logs -f app
 ```
@@ -306,6 +336,7 @@ docker-compose logs -f app
 ## Health Checks
 
 The application includes health check endpoints:
+
 - Docker health check: `http://localhost:8080/v3/api-docs`
 - Swagger UI: `http://localhost:8080/swagger-ui.html`
 
@@ -320,6 +351,7 @@ The application includes health check endpoints:
 ## Error Handling
 
 The API includes comprehensive error handling for:
+
 - 400 Bad Request - Invalid input data
 - 401 Unauthorized - Invalid or missing authentication
 - 403 Forbidden - Insufficient permissions
@@ -329,6 +361,7 @@ The API includes comprehensive error handling for:
 ## Sample Data
 
 The application automatically seeds the database with:
+
 - 1 Admin user (username: `admin`, password: `admin123`)
 - 5 Sample products in various categories
 
@@ -370,5 +403,6 @@ This project is licensed under the Apache License 2.0 - see the LICENSE file for
 
 ## Support
 
-For support and questions, please contact support@example.com#   B l o g - A i  
- 
+For support and questions, please contact support@example.com#� �B�l�o�g�-�A�i�
+�
+�
