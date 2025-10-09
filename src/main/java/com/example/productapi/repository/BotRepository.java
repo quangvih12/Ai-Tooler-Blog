@@ -18,15 +18,77 @@ public interface BotRepository extends JpaRepository<Bot, Long> {
     
     Optional<Bot> findByExternalKey(String externalKey);
     
-    @Query("SELECT b FROM Bot b LEFT JOIN FETCH b.features LEFT JOIN FETCH b.strengths " +
-           "LEFT JOIN FETCH b.weaknesses LEFT JOIN FETCH b.targetUsers LEFT JOIN FETCH b.pricingPlans " +
+    @Query("SELECT DISTINCT b FROM Bot b " +
+           "LEFT JOIN FETCH b.features " +
            "WHERE b.id = :id")
-    Optional<Bot> findByIdWithDetails(@Param("id") Long id);
-    
-    @Query("SELECT b FROM Bot b LEFT JOIN FETCH b.features LEFT JOIN FETCH b.strengths " +
-           "LEFT JOIN FETCH b.weaknesses LEFT JOIN FETCH b.targetUsers LEFT JOIN FETCH b.pricingPlans " +
+    Optional<Bot> findByIdWithFeatures(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT b FROM Bot b " +
+           "LEFT JOIN FETCH b.strengths " +
+           "WHERE b.id = :id")
+    Optional<Bot> findByIdWithStrengths(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT b FROM Bot b " +
+           "LEFT JOIN FETCH b.weaknesses " +
+           "WHERE b.id = :id")
+    Optional<Bot> findByIdWithWeaknesses(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT b FROM Bot b " +
+           "LEFT JOIN FETCH b.targetUsers " +
+           "WHERE b.id = :id")
+    Optional<Bot> findByIdWithTargetUsers(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT b FROM Bot b " +
+           "LEFT JOIN FETCH b.pricingPlans " +
+           "WHERE b.id = :id")
+    Optional<Bot> findByIdWithPricingPlans(@Param("id") Long id);
+
+    default Optional<Bot> findByIdWithDetails(@Param("id") Long id) {
+        return findByIdWithFeatures(id)
+            .map(bot -> {
+                findByIdWithStrengths(id);
+                findByIdWithWeaknesses(id);
+                findByIdWithTargetUsers(id);
+                findByIdWithPricingPlans(id);
+                return bot;
+            });
+    }
+
+    @Query("SELECT DISTINCT b FROM Bot b " +
+           "LEFT JOIN FETCH b.features " +
            "WHERE b.slug = :slug")
-    Optional<Bot> findBySlugWithDetails(@Param("slug") String slug);
+    Optional<Bot> findBySlugWithFeatures(@Param("slug") String slug);
+
+    @Query("SELECT DISTINCT b FROM Bot b " +
+           "LEFT JOIN FETCH b.strengths " +
+           "WHERE b.slug = :slug")
+    Optional<Bot> findBySlugWithStrengths(@Param("slug") String slug);
+
+    @Query("SELECT DISTINCT b FROM Bot b " +
+           "LEFT JOIN FETCH b.weaknesses " +
+           "WHERE b.slug = :slug")
+    Optional<Bot> findBySlugWithWeaknesses(@Param("slug") String slug);
+
+    @Query("SELECT DISTINCT b FROM Bot b " +
+           "LEFT JOIN FETCH b.targetUsers " +
+           "WHERE b.slug = :slug")
+    Optional<Bot> findBySlugWithTargetUsers(@Param("slug") String slug);
+
+    @Query("SELECT DISTINCT b FROM Bot b " +
+           "LEFT JOIN FETCH b.pricingPlans " +
+           "WHERE b.slug = :slug")
+    Optional<Bot> findBySlugWithPricingPlans(@Param("slug") String slug);
+
+    default Optional<Bot> findBySlugWithDetails(@Param("slug") String slug) {
+        return findBySlugWithFeatures(slug)
+            .map(bot -> {
+                findBySlugWithStrengths(slug);
+                findBySlugWithWeaknesses(slug);
+                findBySlugWithTargetUsers(slug);
+                findBySlugWithPricingPlans(slug);
+                return bot;
+            });
+    }
     
     @Query(value = "SELECT * FROM bots b WHERE :tag = ANY(b.tags)", nativeQuery = true)
     Page<Bot> findByTag(@Param("tag") String tag, Pageable pageable);
