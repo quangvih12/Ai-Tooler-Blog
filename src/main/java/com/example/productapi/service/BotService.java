@@ -37,7 +37,9 @@ public class BotService {
         Page<Bot> bots;
         
         if (keyword != null && !keyword.trim().isEmpty()) {
-            bots = botRepository.searchByKeyword(keyword, pageable);
+            // For Unicode-insensitive search, we'll use unsorted pageable and handle sorting manually
+            Pageable unsortedPageable = PageRequest.of(page, size);
+            bots = botRepository.searchByKeywordUnicodeInsensitive(keyword, unsortedPageable);
         } else if (category != null && !category.trim().isEmpty()) {
             bots = botRepository.findByTag(category, pageable);
         } else {
