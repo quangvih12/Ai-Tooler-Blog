@@ -92,14 +92,12 @@ public interface BotRepository extends JpaRepository<Bot, Long> {
     
     @Query(value = "SELECT * FROM bots b WHERE :tag = ANY(b.tags)", nativeQuery = true)
     Page<Bot> findByTag(@Param("tag") String tag, Pageable pageable);
-    
+
     @Query("SELECT b FROM Bot b WHERE " +
-           "(LOWER(b.nameVi) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(b.nameEn) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(b.summaryVi) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(b.summaryEn) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+            "(LOWER(b.nameVi) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(b.nameEn) LIKE LOWER(CONCAT('%', :keyword, '%')))")
     Page<Bot> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
-    
+
     @Query(value = "SELECT DISTINCT unnest(tags) as tag FROM bots ORDER BY tag", nativeQuery = true)
     List<String> findAllUniqueTags();
     
