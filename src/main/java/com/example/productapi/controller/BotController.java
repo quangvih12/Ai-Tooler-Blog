@@ -3,6 +3,7 @@ package com.example.productapi.controller;
 import com.example.productapi.dto.request.BotRequest;
 import com.example.productapi.dto.response.BotListResponse;
 import com.example.productapi.dto.response.BotResponse;
+import com.example.productapi.dto.response.CategoryResponse;
 import com.example.productapi.service.BotService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -81,9 +82,9 @@ public class BotController {
     
     @GetMapping("/categories")
     @Operation(summary = "Get all categories", description = "Get all unique bot categories/tags")
-    public ResponseEntity<List<String>> getAllCategories() {
+    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
         log.info("Getting all bot categories");
-        List<String> categories = botService.getAllCategories();
+        List<CategoryResponse> categories = botService.getAllCategories();
         return ResponseEntity.ok(categories);
     }
     

@@ -89,9 +89,9 @@ public interface BotRepository extends JpaRepository<Bot, Long> {
                 return bot;
             });
     }
-    
-    @Query(value = "SELECT * FROM bots b WHERE :tag = ANY(b.tags)", nativeQuery = true)
-    Page<Bot> findByTag(@Param("tag") String tag, Pageable pageable);
+
+    @Query(value = "SELECT * FROM bots b WHERE b.tags && CAST(:tags AS text[]) ORDER BY b.created_at DESC", nativeQuery = true)
+    Page<Bot> findByTags(@Param("tags") String[] tags, Pageable pageable);
 
     @Query(value = "SELECT * FROM bots b WHERE " +
             "(unaccent(LOWER(b.name_vi)) LIKE unaccent(LOWER('%' || :keyword || '%')) OR " +

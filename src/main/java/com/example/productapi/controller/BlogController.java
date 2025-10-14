@@ -48,12 +48,14 @@ public class BlogController {
             @RequestParam(defaultValue = "publishedAt") String sortBy,
             
             @Parameter(description = "Sort direction (ASC/DESC)")
-            @RequestParam(defaultValue = "DESC") String sortDir) {
+            @RequestParam(defaultValue = "DESC") String sortDir,
+            @Parameter(description = "Status (active/published/)")
+            @RequestParam(defaultValue = "active") String status) {
         
         log.info("Getting all blogs - lang: {}, category: {}, keyword: {}, page: {}, size: {}", 
                 lang, category, keyword, page, size);
         
-        Page<BlogListResponse> blogs = blogService.getAllBlogs(lang, category, keyword, page, size, sortBy, sortDir);
+        Page<BlogListResponse> blogs = blogService.getAllBlogs(lang, category, keyword, page, size, sortBy, sortDir, status);
         return ResponseEntity.ok(blogs);
     }
     

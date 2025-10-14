@@ -3,10 +3,13 @@ package com.example.productapi.service;
 import com.example.productapi.dto.request.BotRequest;
 import com.example.productapi.dto.response.BotListResponse;
 import com.example.productapi.dto.response.BotResponse;
+import com.example.productapi.dto.response.CategoryResponse;
 import com.example.productapi.entity.*;
 import com.example.productapi.exception.BadRequestException;
 import com.example.productapi.exception.ResourceNotFoundException;
 import com.example.productapi.repository.BotRepository;
+import com.example.productapi.repository.CategoryRepository;
+import com.example.productapi.repository.TagsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +32,8 @@ import java.util.stream.Collectors;
 public class BotService {
     
     private final BotRepository botRepository;
+    private final CategoryRepository categoryRepository;
+    private final TagsRepository tagsRepository;
     
     public Page<BotListResponse> getAllBots(String lang, String category, String keyword,
                                             int page, int size, String sortBy, String sortDir) {
@@ -41,7 +47,18 @@ public class BotService {
             Pageable unsortedPageable = PageRequest.of(page, size);
             bots = botRepository.searchByKeywordUnicodeInsensitive(keyword, unsortedPageable);
         } else if (category != null && !category.trim().isEmpty()) {
-            bots = botRepository.findByTag(category, pageable);
+            Optional<Category> cate = categoryRepository.findById(Long.parseLong(category));
+            if (cate.isPresent()) {
+                List<Tags> tags = tagsRepository.findAllByCategoryId(cate.get().getId());
+                List<String> tagNames = tags.stream()
+                        .map(Tags::getName)
+                        .collect(Collectors.toList());
+
+                Pageable unsortedPageable = PageRequest.of(page, size);
+                bots = botRepository.findByTags(tagNames.toArray(new String[0]), unsortedPageable);
+            } else {
+                bots = botRepository.findByTags(new String[]{category}, PageRequest.of(page, size));
+            }
         } else {
             bots = botRepository.findAll(pageable);
         }
@@ -113,11 +130,35 @@ public class BotService {
         botRepository.deleteById(id);
         log.info("Deleted bot with id: {}", id);
     }
-    
-    public List<String> getAllCategories() {
-        return botRepository.findAllUniqueTags();
+
+    public List<CategoryResponse> getAllCategories() {
+        List<CategoryResponse.Tags> tags = tagsRepository.findAll().stream()
+                .map(tag -> CategoryResponse.Tags.builder()
+                        .id(tag.getId())
+                        .name(tag.getName())
+                        .categoryId(tag.getCategory().getId())
+                        .createdAt(tag.getCreatedAt())
+                        .updatedAt(tag.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
+
+        // Map category -> CategoryResponse
+        return categoryRepository.findAll().stream()
+                .map(category -> CategoryResponse.builder()
+                        .id(category.getId())
+                        .title(category.getTitle())
+                        .desc(category.getDesc())
+                        .createdAt(category.getCreatedAt())
+                        .updatedAt(category.getUpdatedAt())
+                        .tags(
+                                tags.stream()
+                                        .filter(t -> t.getCategoryId().equals(category.getId()))
+                                        .collect(Collectors.toList())
+                        )
+                        .build())
+                .collect(Collectors.toList());
     }
-    
+
     private void updateBotFromRequest(Bot bot, BotRequest request) {
         bot.setExternalId(request.getExternalId());
         bot.setExternalKey(request.getExternalKey());
