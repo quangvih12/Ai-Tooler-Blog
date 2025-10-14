@@ -47,7 +47,12 @@ public class BotService {
             Pageable unsortedPageable = PageRequest.of(page, size);
             bots = botRepository.searchByKeywordUnicodeInsensitive(keyword, unsortedPageable);
         } else if (category != null && !category.trim().isEmpty()) {
-            Optional<Category> cate = categoryRepository.findById(Long.parseLong(category));
+            Optional<Category> cate = Optional.empty();
+
+            if (category.matches("\\d+")) {
+                cate = categoryRepository.findById(Long.parseLong(category));
+            }
+
             if (cate.isPresent()) {
                 List<Tags> tags = tagsRepository.findAllByCategoryId(cate.get().getId());
                 List<String> tagNames = tags.stream()
@@ -57,7 +62,8 @@ public class BotService {
                 Pageable unsortedPageable = PageRequest.of(page, size);
                 bots = botRepository.findByTags(tagNames.toArray(new String[0]), unsortedPageable);
             } else {
-                bots = botRepository.findByTags(new String[]{category}, PageRequest.of(page, size));
+                Pageable unsortedPageable = PageRequest.of(page, size);
+                bots = botRepository.findByTags(new String[]{category}, unsortedPageable);
             }
         } else {
             bots = botRepository.findAll(pageable);
