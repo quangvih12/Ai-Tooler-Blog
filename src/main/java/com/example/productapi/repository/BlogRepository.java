@@ -16,11 +16,11 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
     
     Optional<Blog> findBySlug(String slug);
     
-    @Query("SELECT b FROM Blog b WHERE b.status = :status")
-    Page<Blog> findByStatus(@Param("status") String status, Pageable pageable);
+    @Query("SELECT b FROM Blog b")
+    Page<Blog> findAll(Pageable pageable);
     
-    @Query(value = "SELECT * FROM blogs b WHERE :tag = ANY(b.tags) AND b.status = :status", nativeQuery = true)
-    Page<Blog> findByTagAndStatus(@Param("tag") String tag, @Param("status") String status, Pageable pageable);
+    @Query(value = "SELECT * FROM blogs b WHERE :tag = ANY(b.tags)", nativeQuery = true)
+    Page<Blog> findByTagAndStatus(@Param("tag") String tag, Pageable pageable);
     
     @Query("SELECT b FROM Blog b WHERE " +
            "(LOWER(b.titleVi) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
@@ -31,20 +31,18 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
     Page<Blog> searchByKeyword(@Param("keyword") String keyword, @Param("status") String status, Pageable pageable);
 
     @Query(value = "SELECT * FROM blogs b WHERE " +
-           "(unaccent(LOWER(b.title_vi)) LIKE unaccent(LOWER('%' || :keyword || '%')) OR " +
-           "unaccent(LOWER(b.title_en)) LIKE unaccent(LOWER('%' || :keyword || '%')) OR " +
-           "unaccent(LOWER(b.excerpt_vi)) LIKE unaccent(LOWER('%' || :keyword || '%')) OR " +
-           "unaccent(LOWER(b.excerpt_en)) LIKE unaccent(LOWER('%' || :keyword || '%'))) " +
-           "AND b.status = :status", 
-           countQuery = "SELECT count(*) FROM blogs b WHERE " +
-           "(unaccent(LOWER(b.title_vi)) LIKE unaccent(LOWER('%' || :keyword || '%')) OR " +
-           "unaccent(LOWER(b.title_en)) LIKE unaccent(LOWER('%' || :keyword || '%')) OR " +
-           "unaccent(LOWER(b.excerpt_vi)) LIKE unaccent(LOWER('%' || :keyword || '%')) OR " +
-           "unaccent(LOWER(b.excerpt_en)) LIKE unaccent(LOWER('%' || :keyword || '%'))) " +
-           "AND b.status = :status",
-           nativeQuery = true)
-    Page<Blog> searchByKeywordUnicodeInsensitive(@Param("keyword") String keyword, @Param("status") String status, Pageable pageable);
-    
+            "(unaccent(LOWER(b.title_vi)) LIKE unaccent(LOWER('%' || :keyword || '%')) OR " +
+            "unaccent(LOWER(b.title_en)) LIKE unaccent(LOWER('%' || :keyword || '%')) OR " +
+            "unaccent(LOWER(b.excerpt_vi)) LIKE unaccent(LOWER('%' || :keyword || '%')) OR " +
+            "unaccent(LOWER(b.excerpt_en)) LIKE unaccent(LOWER('%' || :keyword || '%')))",
+            countQuery = "SELECT count(*) FROM blogs b WHERE " +
+                    "(unaccent(LOWER(b.title_vi)) LIKE unaccent(LOWER('%' || :keyword || '%')) OR " +
+                    "unaccent(LOWER(b.title_en)) LIKE unaccent(LOWER('%' || :keyword || '%')) OR " +
+                    "unaccent(LOWER(b.excerpt_vi)) LIKE unaccent(LOWER('%' || :keyword || '%')) OR " +
+                    "unaccent(LOWER(b.excerpt_en)) LIKE unaccent(LOWER('%' || :keyword || '%')))",
+            nativeQuery = true)
+    Page<Blog> searchByKeywordUnicodeInsensitive(@Param("keyword") String keyword, Pageable pageable);
+
     @Query(value = "SELECT DISTINCT unnest(tags) as tag FROM blogs WHERE status = :status", nativeQuery = true)
     List<String> findAllUniqueTags(@Param("status") String status);
     

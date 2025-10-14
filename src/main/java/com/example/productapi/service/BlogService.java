@@ -39,11 +39,11 @@ public class BlogService {
         if (keyword != null && !keyword.trim().isEmpty()) {
             // For Unicode-insensitive search, we'll use unsorted pageable and handle sorting manually
             Pageable unsortedPageable = PageRequest.of(page, size);
-            blogs = blogRepository.searchByKeywordUnicodeInsensitive(keyword, "active", unsortedPageable);
+            blogs = blogRepository.searchByKeywordUnicodeInsensitive(keyword, unsortedPageable);
         } else if (category != null && !category.trim().isEmpty()) {
-            blogs = blogRepository.findByTagAndStatus(category, "active", pageable);
+            blogs = blogRepository.findByTagAndStatus(category, pageable);
         } else {
-            blogs = blogRepository.findByStatus("active", pageable);
+            blogs = blogRepository.findAll(pageable);
         }
         
         return blogs.map(blog -> mapToBlogListResponse(blog, lang));
