@@ -134,7 +134,15 @@ public class BlogService {
         }
         
         blog.setStatus(request.getStatus());
-        blog.setPublishedAt(request.getPublishedAt() != null ? request.getPublishedAt() : Instant.now());
+        
+        // Set publishedAt only when status is active
+        if ("active".equalsIgnoreCase(request.getStatus())) {
+            // Only set publishedAt if it's not already set (for new blogs or first time publishing)
+            if (blog.getPublishedAt() == null) {
+                blog.setPublishedAt(Instant.now());
+            }
+        }
+        
         blog.setSource(request.getSource());
         blog.setSourceUrl(request.getSourceUrl());
     }

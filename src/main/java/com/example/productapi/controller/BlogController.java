@@ -49,7 +49,7 @@ public class BlogController {
             
             @Parameter(description = "Sort direction (ASC/DESC)")
             @RequestParam(defaultValue = "DESC") String sortDir,
-            @Parameter(description = "Status (active/published/)")
+            @Parameter(description = "Status (active/deactive/draft)")
             @RequestParam(defaultValue = "active") String status) {
         
         log.info("Getting all blogs - lang: {}, category: {}, keyword: {}, page: {}, size: {}", 

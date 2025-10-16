@@ -33,7 +33,7 @@ public class BotController {
             @Parameter(description = "Language (vi/en)", example = "vi")
             @RequestParam(defaultValue = "vi") String lang,
             
-            @Parameter(description = "Filter by category/tag")
+            @Parameter(description = "Filter by category")
             @RequestParam(required = false) String category,
             
             @Parameter(description = "Search by keyword")
@@ -49,12 +49,15 @@ public class BotController {
             @RequestParam(defaultValue = "createdAt") String sortBy,
             
             @Parameter(description = "Sort direction (ASC/DESC)")
-            @RequestParam(defaultValue = "DESC") String sortDir) {
+            @RequestParam(defaultValue = "DESC") String sortDir,
+
+            @Parameter(description = "Filter by tag")
+            @RequestParam(required = false) String tag) {
         
         log.info("Getting all bots - lang: {}, category: {}, keyword: {}, page: {}, size: {}", 
                 lang, category, keyword, page, size);
         
-        Page<BotListResponse> bots = botService.getAllBots(lang, category, keyword, page, size, sortBy, sortDir);
+        Page<BotListResponse> bots = botService.getAllBots(lang, category, keyword, page, size, sortBy, sortDir, tag);
         return ResponseEntity.ok(bots);
     }
     

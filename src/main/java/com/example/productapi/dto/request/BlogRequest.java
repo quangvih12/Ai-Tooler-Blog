@@ -36,8 +36,6 @@ public class BlogRequest {
     
     private String status = "active";
     
-    private Instant publishedAt;
-    
     @Size(max = 100, message = "Source must not exceed 100 characters")
     private String source;
     

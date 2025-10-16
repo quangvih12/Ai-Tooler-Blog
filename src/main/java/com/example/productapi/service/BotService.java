@@ -34,44 +34,92 @@ public class BotService {
     private final BotRepository botRepository;
     private final CategoryRepository categoryRepository;
     private final TagsRepository tagsRepository;
-    
+
     public Page<BotListResponse> getAllBots(String lang, String category, String keyword,
-                                            int page, int size, String sortBy, String sortDir) {
+                                            int page, int size, String sortBy, String sortDir, String tag) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        
+
         Page<Bot> bots;
-        
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            // For Unicode-insensitive search, we'll use unsorted pageable and handle sorting manually
+
+        // ===== CASE 1: keyword != null && tag != null =====
+        if (keyword != null && !keyword.trim().isEmpty() && tag != null && !tag.trim().isEmpty()) {
             Pageable unsortedPageable = PageRequest.of(page, size);
-            bots = botRepository.searchByKeywordUnicodeInsensitive(keyword, unsortedPageable);
-        } else if (category != null && !category.trim().isEmpty()) {
-            Optional<Category> cate = Optional.empty();
-
-            if (category.matches("\\d+")) {
-                cate = categoryRepository.findById(Long.parseLong(category));
-            }
-
-            if (cate.isPresent()) {
-                List<Tags> tags = tagsRepository.findAllByCategoryId(cate.get().getId());
-                List<String> tagNames = tags.stream()
-                        .map(Tags::getName)
-                        .collect(Collectors.toList());
-
-                Pageable unsortedPageable = PageRequest.of(page, size);
-                bots = botRepository.findByTags(tagNames.toArray(new String[0]), unsortedPageable);
-            } else {
-                Pageable unsortedPageable = PageRequest.of(page, size);
-                bots = botRepository.findByTags(new String[]{category}, unsortedPageable);
-            }
-        } else {
-            bots = botRepository.findAll(pageable);
+            bots = botRepository.searchByKeywordAndTags(keyword, new String[]{tag}, unsortedPageable);
         }
         
+        // ===== CASE 2: keyword only =====
+        else if (keyword != null && !keyword.trim().isEmpty()) {
+            Pageable unsortedPageable = PageRequest.of(page, size);
+            bots = botRepository.searchByKeywordUnicodeInsensitive(keyword, unsortedPageable);
+        }
+
+        // ===== CASE 3-6:category & tag =====
+        else {
+            boolean hasCategory = category != null && !category.trim().isEmpty();
+            boolean hasTag = tag != null && !tag.trim().isEmpty();
+
+            // CASE 1: category = null, tag = null
+            if (!hasCategory && !hasTag) {
+                bots = botRepository.findAll(pageable);
+            }
+            // CASE 2: has category, no tag
+            else if (hasCategory && !hasTag) {
+                Optional<Category> cate = Optional.empty();
+
+                if (category.matches("\\d+")) {
+                    cate = categoryRepository.findById(Long.parseLong(category));
+                }
+
+                if (cate.isPresent()) {
+                    List<Tags> tags = tagsRepository.findAllByCategoryId(cate.get().getId());
+                    List<String> tagNames = tags.stream()
+                            .map(Tags::getName)
+                            .collect(Collectors.toList());
+
+                    Pageable unsortedPageable = PageRequest.of(page, size);
+                    bots = botRepository.findByTags(tagNames.toArray(new String[0]), unsortedPageable);
+                } else {
+                    // If category not found, return empty
+                    bots = Page.empty(pageable);
+                }
+            }
+            // CASE 3: has tag, no category
+            else if (!hasCategory && hasTag) {
+                Pageable unsortedPageable = PageRequest.of(page, size);
+                bots = botRepository.findByTags(new String[]{tag}, unsortedPageable);
+            }
+            // CASE 4: has both category and tag
+            else {
+                Optional<Category> cate = Optional.empty();
+
+                if (category.matches("\\d+")) {
+                    cate = categoryRepository.findById(Long.parseLong(category));
+                }
+
+                if (cate.isPresent()) {
+                    List<Tags> tags = tagsRepository.findAllByCategoryId(cate.get().getId());
+                    List<String> tagNames = tags.stream()
+                            .map(Tags::getName)
+                            .collect(Collectors.toList());
+
+                    // Only keep the passed tag if it is in that category
+                    if (tagNames.contains(tag)) {
+                        Pageable unsortedPageable = PageRequest.of(page, size);
+                        bots = botRepository.findByTags(new String[]{tag}, unsortedPageable);
+                    } else {
+                        bots = Page.empty(pageable);
+                    }
+                } else {
+                    bots = Page.empty(pageable);
+                }
+            }
+        }
+
         return bots.map(bot -> mapToBotListResponse(bot, lang));
     }
-    
+
+
     public BotResponse getBotById(Long id) {
         Bot bot = botRepository.findByIdWithDetails(id)
             .orElseThrow(() -> new ResourceNotFoundException("Bot not found with id: " + id));
