@@ -31,7 +31,17 @@ public class BlogService {
     
     public Page<BlogListResponse> getAllBlogs(String lang, String category, String keyword, 
                                               int page, int size, String sortBy, String sortDir, String status) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+        // Convert camelCase field names to snake_case for native queries
+        String adjustedSortBy = sortBy;
+        if ("publishedAt".equals(sortBy)) {
+            adjustedSortBy = "published_at";
+        } else if ("createdAt".equals(sortBy)) {
+            adjustedSortBy = "created_at";
+        } else if ("updatedAt".equals(sortBy)) {
+            adjustedSortBy = "updated_at";
+        }
+        
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), adjustedSortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         
         Page<Blog> blogs;

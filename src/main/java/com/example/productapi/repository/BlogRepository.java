@@ -19,7 +19,9 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
     @Query("SELECT b FROM Blog b WHERE b.status = :status")
     Page<Blog> findByStatus(@Param("status") String status, Pageable pageable);
     
-    @Query(value = "SELECT * FROM blogs b WHERE :tag = ANY(b.tags) AND b.status = :status", nativeQuery = true)
+    @Query(value = "SELECT * FROM blogs b WHERE :tag = ANY(b.tags) AND b.status = :status", 
+           countQuery = "SELECT count(*) FROM blogs b WHERE :tag = ANY(b.tags) AND b.status = :status",
+           nativeQuery = true)
     Page<Blog> findByTagAndStatus(@Param("tag") String tag, @Param("status") String status, Pageable pageable);
     
     @Query("SELECT b FROM Blog b WHERE " +
