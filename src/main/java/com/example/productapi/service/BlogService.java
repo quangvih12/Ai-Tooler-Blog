@@ -31,19 +31,6 @@ public class BlogService {
     
     public Page<BlogListResponse> getAllBlogs(String lang, String category, String keyword, 
                                               int page, int size, String sortBy, String sortDir, String status) {
-        // Convert camelCase field names to snake_case for native queries
-        String adjustedSortBy = sortBy;
-        if ("publishedAt".equals(sortBy)) {
-            adjustedSortBy = "published_at";
-        } else if ("createdAt".equals(sortBy)) {
-            adjustedSortBy = "created_at";
-        } else if ("updatedAt".equals(sortBy)) {
-            adjustedSortBy = "updated_at";
-        }
-        
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDir), adjustedSortBy);
-        Pageable pageable = PageRequest.of(page, size, sort);
-        
         Page<Blog> blogs;
         
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -51,8 +38,22 @@ public class BlogService {
             Pageable unsortedPageable = PageRequest.of(page, size);
             blogs = blogRepository.searchByKeywordUnicodeInsensitive(keyword, status, unsortedPageable);
         } else if (category != null && !category.trim().isEmpty()) {
+            // For native query, convert camelCase field names to snake_case
+            String adjustedSortBy = sortBy;
+            if ("publishedAt".equals(sortBy)) {
+                adjustedSortBy = "published_at";
+            } else if ("createdAt".equals(sortBy)) {
+                adjustedSortBy = "created_at";
+            } else if ("updatedAt".equals(sortBy)) {
+                adjustedSortBy = "updated_at";
+            }
+            Sort sort = Sort.by(Sort.Direction.fromString(sortDir), adjustedSortBy);
+            Pageable pageable = PageRequest.of(page, size, sort);
             blogs = blogRepository.findByTagAndStatus(category, status, pageable);
         } else {
+            // For JPQL query, use original field names
+            Sort sort = Sort.by(Sort.Direction.fromString(sortDir), sortBy);
+            Pageable pageable = PageRequest.of(page, size, sort);
             blogs = blogRepository.findByStatus(status, pageable);
         }
         
