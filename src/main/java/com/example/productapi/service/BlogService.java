@@ -169,6 +169,9 @@ public class BlogService {
             .status(blog.getStatus())
             .publishedAt(blog.getPublishedAt())
             .createdAt(blog.getCreatedAt())
+            .content_raw("vi".equals(lang) ? blog.getContentEnRaw() : blog.getContentEnRaw())
+            .content_html("vi".equals(lang) ? blog.getContentEnHtml() : blog.getContentEnHtml())
+            .content_text("vi".equals(lang) ? blog.getContentEnText() : blog.getContentEnText())
             .build();
     }
     

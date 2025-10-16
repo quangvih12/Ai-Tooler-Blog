@@ -22,4 +22,7 @@ public class BlogListResponse {
     private String status;
     private Instant publishedAt;
     private Instant createdAt;
+    private String content_raw; // Based on language preference
+    private String content_html; // Based on language preference
+    private String content_text; // Based on language preference
 }
